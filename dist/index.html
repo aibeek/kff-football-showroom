@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101819" />
+    <title>QAZAQSTAN FOOTBALL · Раздевалка</title>
+    <meta
+      name="description"
+      content="Виртуальная раздевалка казахстанского футбола. Форма сборной, клубов и коллекция мячей в интерактивном шоуруме."
+    />
+    <link rel="icon" href="assets/kff.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="loading">
+    <section
+      id="intro"
+      aria-label="Подготовка раздевалки"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="intro-line">QAZAQSTAN FOOTBALL · 2026</div>
+      <img
+        class="intro-emblem"
+        src="assets/kff.png"
+        alt="Эмблема КФФ"
+        width="80"
+        height="80"
+      />
+      <h1>БІР ЕЛ.<br />БІР КОМАНДА.</h1>
+      <p class="intro-caption">ВИРТУАЛЬНАЯ РАЗДЕВАЛКА</p>
+      <div class="intro-loading">
+        <div>
+          <span id="introStatus">Загружаем коллекцию</span
+          ><span id="introPercent">0%</span>
+        </div>
+        <progress
+          id="introProgress"
+          max="100"
+          value="0"
+          aria-label="Загрузка коллекции"
+        ></progress>
+      </div>
+      <button id="introRetry" hidden>Повторить загрузку ↻</button>
+      <small>СБОРНАЯ · КЛУБЫ · КУЛЬТУРА ФУТБОЛА</small>
+    </section>
+    <noscript>Для просмотра 3D-раздевалки включите JavaScript.</noscript>
+    <main id="room" inert>
+      <div class="wood"></div>
+      <div class="lightline"></div>
+      <div class="bench"></div>
+      <div class="floor"></div>
+      <header>
+        <a class="brand" href="./" aria-label="В раздевалку"
+          ><img src="assets/kff.png" alt="Эмблема КФФ" /><span
+            >QAZAQSTAN<br />FOOTBALL</span
+          ></a
+        >
+        <div class="wordmark">
+          БІР ЕЛ. БІР КОМАНДА.<small>РАЗДЕВАЛКА КАЗАХСТАНСКОГО ФУТБОЛА</small>
+        </div>
+        <button id="basket" aria-label="Открыть корзину">
+          КОРЗИНА <b id="basketCount">0</b>
+        </button>
+      </header>
+      <nav id="filters" aria-label="Категории каталога">
+        <button class="active" data-filter="all" aria-pressed="true">
+          Вся коллекция <span>10</span></button
+        ><button data-filter="national" aria-pressed="false">Сборная</button
+        ><button data-filter="clubs" aria-pressed="false">Клубы</button
+        ><button data-filter="balls" aria-pressed="false">Мячи ↗</button>
+      </nav>
+      <div class="rail-label">
+        <span id="sectionLabel">ФОРМА / СЕЗОН 2026</span
+        ><span>ВЫБЕРИ СВОИ ЦВЕТА</span>
+      </div>
+      <section class="rail" aria-label="Форма команд Казахстана">
+        <div class="rod"></div>
+        <div id="rack"></div>
+      </section>
+      <div class="side-note">QAZAQSTAN · FOOTBALL CULTURE · 2026</div>
+      <section id="balls" aria-label="Футбольные мячи">
+        <div class="ball-label">ДОБАВЬ ИГРЫ<span>НАВЕДИ НА МЯЧ</span></div>
+        <div id="ballRack"></div>
+      </section>
+      <footer>
+        <span><i></i> ИНТЕРАКТИВНАЯ КОНЦЕПТ-ВИТРИНА</span>
+        <p>Листай рейл · Выбирай форму · Вращай в 3D</p>
+        <nav>
+          <button id="left" aria-label="Листать влево">←</button
+          ><span id="range">01 — 10</span
+          ><button id="right" aria-label="Листать вправо">→</button>
+        </nav>
+      </footer>
+    </main>
+    <dialog id="product">
+      <button class="close" id="closeProduct" aria-label="Закрыть товар">
+        ×
+      </button>
+      <div class="product-layout">
+        <div class="product-stage">
+          <div
+            id="viewer"
+            tabindex="0"
+            aria-label="Вращать товар стрелками или перетаскиванием"
+          >
+            <img id="flat" alt="" /><canvas id="canvas"></canvas>
+          </div>
+          <div class="rotate-controls">
+            <button id="rotate">↻ Повернуть</button
+            ><small>ПЕРЕТАСКИВАЙ, ЧТОБЫ ВРАЩАТЬ</small>
+          </div>
+        </div>
+        <aside class="product-card">
+          <div class="product-heading">
+            <img id="crest" alt="" /><span id="club"></span
+            ><b id="edition">2026</b>
+          </div>
+          <p class="eyebrow" id="kind"></p>
+          <h1 id="productName"></h1>
+          <div class="price" id="price"></div>
+          <p class="sample">Демонстрационная цена</p>
+          <dl>
+            <div>
+              <dt id="cityLabel">Город</dt>
+              <dd id="city"></dd>
+            </div>
+            <div>
+              <dt>Экипировка</dt>
+              <dd id="brand"></dd>
+            </div>
+            <div>
+              <dt>Цвет</dt>
+              <dd id="color"></dd>
+            </div>
+          </dl>
+          <fieldset>
+            <legend>Размер</legend>
+            <div id="sizes"></div>
+          </fieldset>
+          <button id="add" class="primary">В корзину <span>↗</span></button>
+          <p class="fine">
+            Концепция магазина. Наличие и стоимость уточняются при запуске
+            продаж. Вид спины — стилизация.
+          </p>
+          <div class="product-bottom">
+            <button id="prev" aria-label="Предыдущий товар">←</button
+            ><a id="source" target="_blank" rel="noopener"
+              >Посмотреть форму ↗</a
+            ><button id="next" aria-label="Следующий товар">→</button>
+          </div>
+        </aside>
+      </div>
+    </dialog>
+    <dialog id="cart">
+      <div class="cart-header">
+        <div>
+          <small>ТВОЯ КОМАНДА</small>
+          <h2>Корзина</h2>
+        </div>
+        <button id="closeCart" class="close" aria-label="Закрыть корзину">
+          ×
+        </button>
+      </div>
+      <div id="cartItems"></div>
+      <div id="cartSummary">
+        <div class="total"><span>Итого</span><strong id="total"></strong></div>
+        <p class="fine">
+          Демонстрационная корзина. Оплата и отправка заказов будут доступны
+          после подключения магазина.
+        </p>
+        <button id="continue" class="primary">Продолжить выбор →</button>
+      </div>
+    </dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="boot.js?v=1"></script>
+  </body>
+</html>
