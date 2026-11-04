@@ -1290,67 +1290,22 @@ noscript {
   cursor: grabbing !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .ball-arrival .ball-product img {
-    animation: ball-arrival 2.35s linear both;
-  }
-  .ball-arrival .ball-product:before {
-    animation: arrival-shadow 2.35s linear both;
-  }
-  @keyframes ball-arrival {
-    0%,
-    20% {
-      transform: translateY(-110vh) rotate(-105deg);
-    }
-    45% {
-      transform: translateY(0) rotate(0deg) scale(1.08, 0.91);
-    }
-    47% {
-      transform: translateY(-2px) rotate(3deg) scale(0.97, 1.04);
-    }
-    60% {
-      transform: translateY(-105px) rotate(22deg) scale(1);
-    }
-    72% {
-      transform: translateY(0) rotate(37deg) scale(1.04, 0.95);
-    }
-    82% {
-      transform: translateY(-35px) rotate(27deg) scale(1);
-    }
-    90% {
-      transform: translateY(0) rotate(16deg) scale(1.02, 0.98);
-    }
-    95% {
-      transform: translateY(-9px) rotate(8deg) scale(1);
-    }
-    100% {
-      transform: translateY(0) rotate(0deg) scale(1);
-    }
-  }
-  @keyframes arrival-shadow {
-    0%,
-    20% {
-      opacity: 0;
-      scale: 0.2;
-    }
-    45%,
-    72%,
-    90%,
-    100% {
-      opacity: 1;
-      scale: 1;
-    }
-    60% {
-      opacity: 0.3;
-      scale: 0.45;
-    }
-    82% {
-      opacity: 0.65;
-      scale: 0.75;
-    }
-    95% {
-      opacity: 0.85;
-      scale: 0.9;
-    }
-  }
+.ball-arrival .ball-product img {
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.ball-arrival .ball-product:before {
+  opacity: 0;
+}
+.ball-product .arrival-shadow {
+  position: absolute;
+  bottom: 21px;
+  left: 5%;
+  width: 90%;
+  height: 10px;
+  background: #000b;
+  border-radius: 50%;
+  filter: blur(5px);
+  margin: 0;
+  pointer-events: none;
 }

@@ -475,9 +475,3 @@ dispatchEvent(new CustomEvent("showroom-progress", { detail: 80 }));
 const rackModule = await import("./rack.js");
 await rackModule.mountRack(shirts);
 dispatchEvent(new CustomEvent("showroom-progress", { detail: 100 }));
-
-const arrivalBall = document.querySelector(".ball-product img");
-arrivalBall.addEventListener("animationend", (event) => {
-  if (event.animationName === "ball-arrival")
-    document.body.classList.remove("ball-arrival");
-});
