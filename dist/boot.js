@@ -15,7 +15,7 @@ addEventListener("showroom-progress", (event) => {
         : "Добро пожаловать";
 });
 try {
-  await import("./app.js?v=preload-1");
+  await import("./app.js?v=fast-2");
   progress.value = 100;
   percent.textContent = "100%";
   status.textContent = "Добро пожаловать";
@@ -25,7 +25,8 @@ try {
   document.getElementById("room").inert = false;
   document.body.classList.remove("loading");
   loader.classList.add("complete");
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) dropBall();
+  dispatchEvent(new Event("showroom-ready"));
+  if (document.documentElement.dataset.quality !== "lite" && !matchMedia("(prefers-reduced-motion: reduce)").matches) dropBall();
   loader.addEventListener("transitionend", () => loader.remove(), {
     once: true,
   });

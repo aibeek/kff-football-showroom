@@ -1,11 +1,13 @@
 import * as THREE from "./assets/three.js";
-import { buildProduct } from "./model.js";
+import { buildProduct } from "./model.js?v=fast-2";
 
 export async function gpuRack(canvas) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true,
+    antialias: false,
+    powerPreference: "low-power",
+    failIfMajorPerformanceCaveat: true,
   });
   renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -20,7 +22,7 @@ export async function gpuRack(canvas) {
   const key = new THREE.DirectionalLight(0xfff4de, 3.4);
   key.position.set(-3, 4, 5);
   key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.mapSize.set(512, 512);
   key.shadow.camera.left = -6;
   key.shadow.camera.right = 6;
   key.shadow.camera.top = 3;
@@ -47,6 +49,19 @@ export async function gpuRack(canvas) {
   let width = 1,
     height = 1;
   return {
+    dispose() {
+      for (const item of items) {
+        item.group.traverse(mesh => {
+          mesh.geometry?.dispose();
+          mesh.customDepthMaterial?.dispose();
+          mesh.material?.dispose();
+        });
+      }
+      backdrop.geometry.dispose();
+      backdrop.material.dispose();
+      key.shadow.map?.dispose();
+      renderer.dispose();
+    },
     async add(product) {
       const meshes = await buildProduct(product),
         group = new THREE.Group();

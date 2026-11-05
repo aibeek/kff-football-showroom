@@ -1,7 +1,7 @@
 import * as THREE from "./assets/three.js";
-import { artwork } from "./art.js";
-import { kitTexture } from "./kit-texture.js";
-import { shirtMaterial } from "./cloth-material.js";
+import { artwork } from "./art.js?v=fast-2";
+import { kitTexture } from "./kit-texture.js?v=fast-2";
+import { shirtMaterial } from "./cloth-material.js?v=fast-2";
 async function geometryFile(url) {
   const buffer = await fetch(url).then((r) => {
     if (!r.ok) throw Error("Model unavailable");
@@ -63,7 +63,7 @@ export async function buildProduct(product) {
   const art = await artwork(product);
   let meshes = [];
   if (product.kind === "ball") {
-    const geometry = new THREE.SphereGeometry(0.43, 64, 48);
+    const geometry = new THREE.SphereGeometry(0.43, 32, 24);
     const p = geometry.attributes.position,
       uv = geometry.attributes.uv;
     for (let i = 0; i < p.count; i++)
@@ -128,9 +128,11 @@ export async function createViewer(canvas) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true,
+    antialias: false,
+    powerPreference: "low-power",
+    failIfMajorPerformanceCaveat: true,
   });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.8));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
@@ -188,7 +190,8 @@ export async function createViewer(canvas) {
   function tick(now) {
     frame = 0;
     if (!current || document.hidden) return;
-    const dt = Math.min((now - last) / 1000 || 0.016, 0.04);
+    if (now - last < 32) { frame = requestAnimationFrame(tick); return; }
+    const dt = Math.min((now - last) / 1000 || 0.033, 0.05);
     last = now;
     rotation += (target - rotation) * (1 - Math.exp(-dt * 16));
     group.rotation.y =

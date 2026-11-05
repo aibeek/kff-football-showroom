@@ -13,7 +13,7 @@
       content="Виртуальная раздевалка казахстанского футбола. Форма сборной, клубов и коллекция мячей в интерактивном шоуруме."
     />
     <link rel="icon" href="assets/kff.png" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=fast-2" />
   </head>
   <body class="loading">
     <section
@@ -86,6 +86,7 @@
         <div class="ball-label">ДОБАВЬ ИГРЫ<span>НАВЕДИ НА МЯЧ</span></div>
         <div id="ballRack"></div>
       </section>
+      <div class="quality-control"><label for="quality">Графика</label><select id="quality" aria-label="Качество графики"><option value="auto">Авто</option><option value="lite">Лёгкая</option><option value="3d">3D</option></select><span id="qualityStatus" role="status"></span></div>
       <footer>
         <span><i></i> ИНТЕРАКТИВНАЯ КОНЦЕПТ-ВИТРИНА</span>
         <p>Листай рейл · Выбирай форму · Вращай в 3D</p>
@@ -176,6 +177,6 @@
       </div>
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
-    <script type="module" src="boot.js?v=1"></script>
+    <script type="module" src="boot.js?v=fast-2"></script>
   </body>
 </html>

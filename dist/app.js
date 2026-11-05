@@ -1,4 +1,6 @@
-import { artwork } from "./art.js";
+import { artwork, posterURL } from "./art.js?v=fast-2";
+import { setupQuality, use3D, enableLite } from "./performance.js?v=fast-2";
+setupQuality();
 const $ = (id) => document.getElementById(id),
   money = (n) => new Intl.NumberFormat("ru-KZ").format(n) + " ₸";
 const shirts = await fetch("products.json").then((r) => r.json());
@@ -66,6 +68,23 @@ let selected = null,
   toastTimer;
 const artSources = new Map();
 const assetJobs = [];
+const posterJobs = new Map();
+const deferredPosters = [];
+function preparePoster(p, button, image) {
+  if (!posterJobs.has(p.id)) {
+    const job = artwork(p).then(async art => {
+      image.src = art.src;
+      artSources.set(p.id, art.src);
+      await image.decode();
+      button.classList.add("poster-ready");
+    }).catch(() => {
+      button.classList.add("poster-unavailable");
+      button.title = "Фото временно недоступно. Откройте товар, чтобы повторить загрузку.";
+    });
+    posterJobs.set(p.id, job);
+  }
+  return posterJobs.get(p.id);
+}
 let completedAssets = 0;
 function trackAsset(job) {
   assetJobs.push(
@@ -73,7 +92,7 @@ function trackAsset(job) {
       completedAssets++;
       dispatchEvent(
         new CustomEvent("showroom-progress", {
-          detail: (completedAssets / products.length) * 65,
+          detail: Math.min(95, completedAssets * 15),
         }),
       );
     }),
@@ -106,6 +125,8 @@ for (const [i, p] of shirts.entries()) {
   const crest = document.createElement("img");
   crest.src = "assets/" + p.id + "-crest.png";
   crest.alt = "";
+  crest.loading = "lazy";
+  crest.decoding = "async";
   label.append(
     crest,
     document.createTextNode(p.name + (p.id.endsWith("away") ? " / AWAY" : "")),
@@ -113,18 +134,10 @@ for (const [i, p] of shirts.entries()) {
   button.append(hook, number, image, label);
   button.onclick = () => openProduct(p, button);
   $("rack").append(button);
-  trackAsset(
-    artwork(p)
-      .then(async (art) => {
-        image.src = art.src;
-        artSources.set(p.id, art.src);
-        await image.decode();
-      })
-      .catch(async () => {
-        image.src = "assets/" + p.id + ".jpg";
-        await image.decode();
-      }),
-  );
+  image.decoding = "async";
+  if (button.getBoundingClientRect().left < innerWidth + 100) {
+    trackAsset(preparePoster(p, button, image));
+  } else deferredPosters.push({p, button, image});
 }
 for (const p of balls) {
   const button = document.createElement("button");
@@ -264,13 +277,10 @@ rail.addEventListener(
 rail.addEventListener("dragstart", (event) => event.preventDefault());
 
 function loadViewer() {
-  return (viewerPromise ??= import("./model.js")
+  if (!use3D()) return Promise.resolve(null);
+  return (viewerPromise ??= import("./model.js?v=fast-2")
     .then((m) => m.createViewer($("canvas")))
-    .catch(() =>
-      import("./software-3d.js").then((m) =>
-        m.createSoftwareViewer($("canvas")),
-      ),
-    ));
+    .catch(() => { enableLite(); return null; }));
 }
 async function openProduct(p, opener) {
   if (opener) returnFocus = opener;
@@ -279,6 +289,7 @@ async function openProduct(p, opener) {
   const token = ++request;
   angle = 0;
   ready = false;
+  $("viewer").setAttribute("aria-label", use3D() ? "Вращать товар стрелками или перетаскиванием" : "Фото товара");
   $("productName").textContent = p.name;
   $("club").textContent = p.team;
   $("kind").textContent =
@@ -316,17 +327,22 @@ async function openProduct(p, opener) {
     };
     $("sizes").append(b);
   }
-  $("flat").src = artSources.get(p.id) || "";
+  $("flat").src = artSources.get(p.id) || posterURL(p);
+  $("rotate").hidden = !use3D();
+  document.querySelector(".rotate-controls small").hidden = !use3D();
   $("flat").alt = p.kind === "ball" ? "Мяч " + p.name : "Футболка " + p.team;
   $("flat").style.transform = "none";
   $("flat").hidden = false;
   $("canvas").style.visibility = "hidden";
   if (!$("product").open) $("product").showModal();
+  dispatchEvent(new CustomEvent("showroom-dialog", {detail:true}));
   try {
     const art = await artwork(p);
     if (token !== request) return;
     $("flat").src = art.src;
     viewer = await loadViewer();
+    $("rotate").hidden = !viewer;
+    document.querySelector(".rotate-controls small").hidden = !viewer;
     if (!viewer || token !== request) return;
     await viewer.show(p, () => token === request);
     if (token !== request) return;
@@ -336,6 +352,7 @@ async function openProduct(p, opener) {
   } catch {}
 }
 function endProduct() {
+  dispatchEvent(new CustomEvent("showroom-dialog", {detail:false}));
   request++;
   viewer?.pause();
   cancelAnimationFrame(turnFrame);
@@ -345,6 +362,7 @@ function endProduct() {
 $("product").addEventListener("close", endProduct);
 $("closeProduct").onclick = () => $("product").close();
 function rotate(value) {
+  if (!use3D()) return;
   angle = value;
   if (ready) viewer.angle(value);
   else
@@ -422,7 +440,8 @@ function renderCart() {
     const el = document.createElement("div");
     el.className = "cart-row";
     const img = document.createElement("img");
-    img.src = artSources.get(p.id) || "";
+    img.src = artSources.get(p.id) || posterURL(p);
+    img.loading = "lazy";
     img.alt = p.name;
     const detail = document.createElement("div");
     const name = document.createElement("strong");
@@ -460,18 +479,25 @@ function renderCart() {
 $("basket").onclick = () => {
   renderCart();
   $("cart").showModal();
+  dispatchEvent(new CustomEvent("showroom-dialog", {detail:true}));
 };
+$("cart").addEventListener("close", () => dispatchEvent(new CustomEvent("showroom-dialog", {detail:false})));
 $("closeCart").onclick = $("continue").onclick = () => $("cart").close();
 saveCart();
 
 await Promise.all(assetJobs);
-await document.fonts.ready;
-await Promise.all(
-  [...document.images]
-    .filter((image) => image.getAttribute("src"))
-    .map((image) => image.decode()),
-);
-dispatchEvent(new CustomEvent("showroom-progress", { detail: 80 }));
-const rackModule = await import("./rack.js");
-await rackModule.mountRack(shirts);
 dispatchEvent(new CustomEvent("showroom-progress", { detail: 100 }));
+// Only the first screen is required for entry; the rest follows horizontal scrolling.
+addEventListener("showroom-ready", () => {
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) {
+        const item = deferredPosters.find(x => x.button === entry.target);
+        if (item) preparePoster(item.p, item.button, item.image);
+        observer.unobserve(entry.target);
+      }
+    }, {root: rack, rootMargin:'0px 200px', threshold:0});
+    deferredPosters.forEach(item => observer.observe(item.button));
+  } else deferredPosters.forEach(item => preparePoster(item.p, item.button, item.image));
+  if (use3D()) import('./rack.js?v=fast-2').then(m => m.mountRack(shirts)).catch(() => enableLite());
+}, {once:true});

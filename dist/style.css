@@ -1309,3 +1309,26 @@ noscript {
   margin: 0;
   pointer-events: none;
 }
+
+/* Posters have fixed space and never expose a broken image while loading. */
+.shirt:not(.poster-ready) .shirt-image { visibility: hidden; }
+.shirt:not(.poster-ready)::after {
+  content: ""; position:absolute; inset:18% 20% 12%;
+  background:linear-gradient(135deg,#e9dcb316,#e9dcb307); border-radius:16% 16% 8% 8%;
+  pointer-events:none;
+}
+.shirt.poster-unavailable::after { content:"Фото загружается при открытии";font:11px Arial;padding:30px 10px; }
+.quality-control { position:absolute;right:4%;top:18%;display:flex;align-items:center;gap:8px;z-index:5;font:10px Arial;color:#d7d0b8; }
+.quality-control select { font:11px Arial;color:#f6f0dc;background:#172320;border:1px solid #ffffff30;border-radius:18px;padding:7px; }
+.quality-control span { font-size:9px;opacity:.65; }
+[data-quality="lite"] .shirt { animation:none;filter:none;transform:none;transition:transform .2s; }
+[data-quality="lite"] .shirt:hover,[data-quality="lite"] .shirt:focus-visible {transform:translateY(-4px);filter:none;}
+[data-quality="lite"] .ball-product img,[data-quality="lite"] #flat {filter:none;}
+[data-quality="lite"] dialog::backdrop {backdrop-filter:none;}
+[data-quality="lite"] .arrival-shadow {display:none;}
+[data-quality="lite"] .bounce img,[data-quality="lite"] .bounce::after {animation:none;}
+@media(max-width:700px) {
+  .quality-control {top:max(150px,22%);right:5%;gap:5px;}
+  .quality-control span {display:none;}
+  .quality-control select {padding:5px;font-size:10px;}
+}

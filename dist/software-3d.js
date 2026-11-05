@@ -1,5 +1,5 @@
-import { buildProduct } from "./model.js";
-import { artwork } from "./art.js";
+import { buildProduct } from "./model.js?v=fast-2";
+import { artwork } from "./art.js?v=fast-2";
 
 function simplify(geometry, step) {
   const positions = geometry.attributes.position,
